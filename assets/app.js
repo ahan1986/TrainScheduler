@@ -3,19 +3,19 @@ var destinationName;
 var firstTrainName;
 var frequencyName;
 
-  // Initialize Firebase
-  var config = {
+// Initialize Firebase
+var config = {
     apiKey: "AIzaSyA994Np653NXUCpQ0ymP0jNKCkfaaJfFiU",
     authDomain: "timescheduler-afa27.firebaseapp.com",
     databaseURL: "https://timescheduler-afa27.firebaseio.com",
     projectId: "timescheduler-afa27",
     storageBucket: "timescheduler-afa27.appspot.com",
     messagingSenderId: "82488578649"
-  };
-  firebase.initializeApp(config);
-  var database = firebase.database();
+};
+firebase.initializeApp(config);
+var database = firebase.database();
 
-$("#submit").on("click", function(){
+$("#submit").on("click", function () {
     event.preventDefault();
     trainName = $("#trainName").val();
     destinationName = $("#destinationName").val();
@@ -28,7 +28,6 @@ $("#submit").on("click", function(){
         firstTrainName: firstTrainName,
         frequencyName: frequencyName
     })
-    console.log(trainName);
 
     //clearing out the values in the input textboxes
     $("#trainName").val("");
@@ -37,49 +36,44 @@ $("#submit").on("click", function(){
     $("#frequencyName").val("");
 })
 
-database.ref().on("child_added", function(childSnapShot, prevChildKey) {
+database.ref().on("child_added", function (childSnapShot, prevChildKey) {
 
     var dbName = childSnapShot.val().trainName;
     var dbDestination = childSnapShot.val().destinationName;
     var dbfirstTrainName = childSnapShot.val().firstTrainName;
     var dbfrequencyName = childSnapShot.val().frequencyName;
 
-        //current time
-        var timeNow = moment().format("HH:mm");
-        console.log(timeNow);
+    //current time
+    var timeNow = moment().format("HH:mm");
 
-        //setting a variable for firstTrain time input in moment.js
-        var firstTrain = moment(dbfirstTrainName, "HH:mm").format("HH:mm");
-        console.log(firstTrain);
+    //setting a variable for firstTrain time input in moment.js
+    var firstTrain = moment(dbfirstTrainName, "HH:mm").format("HH:mm");
 
-//7:00 - now in minutes
-        var a = moment().diff(moment(firstTrain, "HH:mm"), "minutes");
-        console.log(a);
-        
-       var b = a % dbfrequencyName;
-       console.log(b);
-       // minutes left until next arrival
-       var d = dbfrequencyName - b;
-       console.log(d);
+    //using moment.js to get the difference between the current time and the first train time that was added by the user.
+    var firstTrainMinusCurrentTime = moment().diff(moment(firstTrain, "HH:mm"), "minutes");
 
-       // when the next train should come in military time format
-       var c = moment(timeNow, "HH:mm").add(d, "minutes").format("HH:mm");
-       console.log(c);
-    
+    //Once first cycle of the frequency has passed, this will get the remainder. Meaning: this will get the minutes that has passed the first frequency.
+    var minutesThatPassedFreq = firstTrainMinusCurrentTime % dbfrequencyName;
 
-        //current time plus the frequency that was inputed
-        var dbnextArrival = moment(c, "HH:mm").format("LT");
-     
+    // Subtracting the remainder from above with the frequency of that inputed to give the remaining minutes left until the next train to arrive
+    var minutesLeftForNextTrain = dbfrequencyName - minutesThatPassedFreq;
 
-        var minutesAway;
+    // when the next train should come in military time format
+    var nextTrainTimeInMilitary = moment(timeNow, "HH:mm").add(minutesLeftForNextTrain, "minutes").format("HH:mm");
 
-        if (a < dbfrequencyName) {
-           minutesAway = dbfrequencyName - a
-        }
-        minutesAway = d;
+    //current time plus the frequency that was inputed
+    var dbnextArrival = moment(nextTrainTimeInMilitary, "HH:mm").format("LT");
 
 
-    $("#trainTable > tbody").append("<tr><td>"+dbName+"</td><td>"+dbDestination+"</td><td>"+ dbfrequencyName+"</td><td>"+ dbnextArrival+"</td><td>"+ minutesAway +"</td></tr>");
+    var minutesAway;
+    // I've created this if statement when the user adds for thefirst train time.  Without this, the math above will not work.
+    if (firstTrainMinusCurrentTime < dbfrequencyName) {
+        minutesAway = dbfrequencyName - firstTrainMinusCurrentTime
+    }
+    minutesAway = minutesLeftForNextTrain;
+
+    //appending all the results and data into the html
+    $("#trainTable > tbody").append("<tr><td>" + dbName + "</td><td>" + dbDestination + "</td><td>" + dbfrequencyName + "</td><td>" + dbnextArrival + "</td><td>" + minutesAway + "</td></tr>");
 
 });
 
