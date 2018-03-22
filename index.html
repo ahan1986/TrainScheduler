@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Live Train Scheduler</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <!-- jQuery library -->
@@ -20,6 +20,7 @@
     <div class="jumbotron">Anytime is Train Time
         <br>
         <p>Choo Choo. Chee Chee.</p>
+        <p>State of the Art - Live Update Technology!</p>
     </div>
     <!-- container for the "current Train schedule" -->
     <div class="container">
@@ -39,8 +40,10 @@
                                 <th>Minutes Away</th>
                             </tr>
                         </thead>
-                        <tbody class="text-left">
+                        
+                        <tbody class="text-left" id="refresh">
                         </tbody>
+                        <div class="text-align: center"  id="refresher"></div>
                     </table>
                 </div>
             </div>
@@ -57,17 +60,17 @@
                     <form roles="form">
                         <div class="form-group">
                             <label class="name-input" style="text-align:left">Train Name</label>
-                            <input type="text" id="trainName" class="form-control">
+                            <input type="text" id="trainName" class="form-control" placeholder="Train Name">
 
                             <label class="destination-input" style="text-align:left">Destination</label>
-                            <input type="text" class="form-control" id="destinationName">
+                            <input type="text" class="form-control" id="destinationName" placeholder="Final Destination???">
 
                             <label class="firstTrain-input" style="text-align:left">First Train (HH:mm - miltary time)</label>
-                            <input type="text" class="form-control" id="firstTrainName" oninput="javascript: if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength); if(this.value.length === 2) this.value = this.value +':';"
-                                maxLength="5">
+                            <input type="text" class="form-control" id="firstTrainName" oninput="javascript: if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                maxLength="4" placeholder="Requires 3 or 4 digits">
 
                             <label class="frequency-input" style="text-align:left">Frequency (min)</label>
-                            <input type="number" class="form-control" id="frequencyName" maxLength="3" oninput="javascript: if(this.value.length>maxLength) this.value = this.value = this.value.slice(0, this.maxLength);">
+                            <input type="number" class="form-control" id="frequencyName" maxLength="2" oninput="javascript: if(this.value.length>maxLength) this.value = this.value = this.value.slice(0, this.maxLength);" placeholder="Requires 2 digit Numbers">
                         </div>
                         <button class="btn btn-default" id="submit" type="submit">Submit</button>
                     </form>
